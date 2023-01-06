@@ -12,6 +12,16 @@
 
 using namespace std;
 
+enum Act { MOVERIGHT, MOVELEFT, DOWNKICK, UPKICK, DEFENSE };
+const int key[] = { 0x44, 0x41, 0x46, 0x47, 0x52 };
+const Act motion[] = { DEFENSE, DOWNKICK, DOWNKICK, UPKICK, UPKICK }; // According to HCI.gbd
+
+void press(Act act) {
+	keybd_event(key[act], 0x1E, 0, 0);
+	keybd_event(key[act], 0x1E, KEYEVENTF_KEYUP, 0);
+	Sleep(1000);
+}
+
 int main(int argc, char** argv)
 {
 #pragma region Sensor related code
@@ -69,7 +79,7 @@ int main(int argc, char** argv)
 
 #pragma region Visual Gesture Builder Database
 	// Load gesture dataase from File
-	wstring sDatabaseFile = L"test.gbd";	// Modify this file to load other file
+	wstring sDatabaseFile = L"HCI.gbd";	// Modify this file to load other file
 	IVisualGestureBuilderDatabase* pGestureDatabase = nullptr;
 	wcout << L"Try to load gesture database file " << sDatabaseFile << endl;
 	if (CreateVisualGestureBuilderDatabaseInstanceFromFile(sDatabaseFile.c_str(), &pGestureDatabase) != S_OK)
@@ -208,46 +218,26 @@ int main(int argc, char** argv)
 								for (UINT j = 0; j < iGestureCount; ++j)
 								{
 									// get gesture information
-									aGestureList[j]->get_GestureType(&mType);
+									// aGestureList[j]->get_GestureType(&mType);
+									// We chose only mType == GestureType_Discrete rather than GestureType_Continuous
 									aGestureList[j]->get_Name(uTextLength, sName);
 
-									if (mType == GestureType_Discrete)
+									// get gesture result
+									IDiscreteGestureResult* pGestureResult = nullptr;
+									if (pGestureFrame->get_DiscreteGestureResult(aGestureList[j], &pGestureResult) == S_OK)
 									{
-										// get gesture result
-										IDiscreteGestureResult* pGestureResult = nullptr;
-										if (pGestureFrame->get_DiscreteGestureResult(aGestureList[j], &pGestureResult) == S_OK)
+										// check if is detected
+										BOOLEAN bDetected = false;
+										if (pGestureResult->get_Detected(&bDetected) == S_OK && bDetected)
 										{
-											// check if is detected
-											BOOLEAN bDetected = false;
-											if (pGestureResult->get_Detected(&bDetected) == S_OK && bDetected)
-											{
-												float fConfidence = 0.0f;
-												pGestureResult->get_Confidence(&fConfidence);
+											float fConfidence = 0.0f;
+											pGestureResult->get_Confidence(&fConfidence);
 
-												// output information
-												wcout << L"Detected Gesture " << sName << L" @" << fConfidence << endl;
-											}
-											pGestureResult->Release();
+											// output information
+											wcout << L"Detected Gesture " << sName << L" @" << fConfidence << endl;
+											press(motion[i]);
 										}
-									}
-									else if (mType == GestureType_Continuous)
-									{
-										// get gesture result
-										IContinuousGestureResult* pGestureResult = nullptr;
-										if (pGestureFrame->get_ContinuousGestureResult(aGestureList[j], &pGestureResult) == S_OK)
-										{
-											// get progress
-											float fProgress = 0.0f;
-											if (pGestureResult->get_Progress(&fProgress) == S_OK)
-											{
-												if (fProgress > 0.5f)
-												{
-													// output information
-													wcout << L"Detected Gesture " << sName << L" " << fProgress << endl;
-												}
-											}
-											pGestureResult->Release();
-										}
+										pGestureResult->Release();
 									}
 								}
 							}
