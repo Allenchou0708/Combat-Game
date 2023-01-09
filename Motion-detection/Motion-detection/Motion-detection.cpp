@@ -12,25 +12,34 @@
 
 using namespace std;
 
-enum Act { DOWNKICK, UPKICK, DEFENSE };
+enum Act { DOWNKICK = 0, UPKICK, DEFENSE, NOP };
 const int key1[] = { 0x57, 0x51, 0x45 };
 const int key2[] = { 0x55, 0x59, 0x49 };
-const Act motion[] = { DEFENSE, DOWNKICK, DOWNKICK, UPKICK, UPKICK }; // According to HCI.gbd
+const Act motion[] = { DEFENSE, UPKICK }; // According to HCI_2.gbd
+const Act motion2[] = { DOWNKICK }; // According to Down_Kick_Right.gba
+int databaseChoice = 0;
+const float Limit = 0.04;
 
 void press(int act) {
 	keybd_event(act, 0x1E, 0, 0);
 	keybd_event(act, 0x1E, KEYEVENTF_KEYUP, 0);
-	// Sleep(1000);
 }
 
 // Defined by myself
 int userCount = 0;
-int p1x, p2x;
-Act p1Act, p2Act;
+int p1x = 0, p2x = 0;
+Act p1Act = NOP, p2Act = NOP;
 
 void keyboardInput(Act p1, Act p2) {
-	press(key1[p1]);
-	press(key2[p2]);
+	if (p1 != NOP) 
+	{
+		press(key1[p1]);
+	}
+	if (p2 != NOP)
+	{
+		press(key2[p2]);
+	}
+	// Sleep(2000);
 }
 
 
@@ -91,10 +100,18 @@ int main(int argc, char** argv)
 
 #pragma region Visual Gesture Builder Database
 	// Load gesture dataase from File
-	wstring sDatabaseFile = L"HCI.gbd";	// Modify this file to load other file
+	wstring sDatabaseFile = L"HCI_2.gbd";	// Modify this file to load other file
 	IVisualGestureBuilderDatabase* pGestureDatabase = nullptr;
-	wcout << L"DataBase: ";
-	wcin >> sDatabaseFile;
+	cout << "Database ID: ";
+	cin >> databaseChoice;
+	if (databaseChoice == 1)
+	{
+		sDatabaseFile = L"HCI_2.gbd";
+	}
+	else if(databaseChoice == 2)
+	{
+		sDatabaseFile = L"Down_Kick_Right.gba";
+	}
 	wcout << L"Try to load gesture database file " << sDatabaseFile << endl;
 	if (CreateVisualGestureBuilderDatabaseInstanceFromFile(sDatabaseFile.c_str(), &pGestureDatabase) != S_OK)
 	{
@@ -250,16 +267,32 @@ int main(int argc, char** argv)
 										{
 											float fConfidence = 0.0f;
 											pGestureResult->get_Confidence(&fConfidence);
-
+											if (fConfidence < Limit)
+												continue;
 											// output information
 											wcout << L"Detected Gesture " << sName << L" @" << fConfidence << endl;
+											// wcout << sName << ": " << j << endl;
 											if (userCount == 1)
 											{
-												p1Act = motion[i];
+												if (databaseChoice == 1)
+												{
+													p1Act = motion[j];
+												}
+												else
+												{
+													p1Act = motion2[j];
+												}
 											}
 											else if (userCount == 2)
 											{
-												p2Act = motion[i];
+												if (databaseChoice == 1)
+												{
+													p2Act = motion[j];
+												}
+												else
+												{
+													p2Act = motion2[j];
+												}
 											}
 										}
 										pGestureResult->Release();
@@ -299,6 +332,7 @@ int main(int argc, char** argv)
 					}
 					keyboardInput(p1Act, p2Act);
 				}
+				p1Act = p2Act = NOP;
 				userCount = 0;
 			}
 			else
