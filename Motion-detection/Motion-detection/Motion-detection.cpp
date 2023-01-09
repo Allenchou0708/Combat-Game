@@ -81,6 +81,8 @@ int main(int argc, char** argv)
 	// Load gesture dataase from File
 	wstring sDatabaseFile = L"HCI.gbd";	// Modify this file to load other file
 	IVisualGestureBuilderDatabase* pGestureDatabase = nullptr;
+	wcout << L"DataBase: ";
+	wcin >> sDatabaseFile;
 	wcout << L"Try to load gesture database file " << sDatabaseFile << endl;
 	if (CreateVisualGestureBuilderDatabaseInstanceFromFile(sDatabaseFile.c_str(), &pGestureDatabase) != S_OK)
 	{
