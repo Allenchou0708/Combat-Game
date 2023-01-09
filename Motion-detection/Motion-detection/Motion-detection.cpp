@@ -12,15 +12,27 @@
 
 using namespace std;
 
-enum Act { MOVERIGHT, MOVELEFT, DOWNKICK, UPKICK, DEFENSE };
-const int key[] = { 0x44, 0x41, 0x46, 0x47, 0x52 };
+enum Act { DOWNKICK, UPKICK, DEFENSE };
+const int key1[] = { 0x57, 0x51, 0x45 };
+const int key2[] = { 0x55, 0x59, 0x49 };
 const Act motion[] = { DEFENSE, DOWNKICK, DOWNKICK, UPKICK, UPKICK }; // According to HCI.gbd
 
-void press(Act act) {
-	keybd_event(key[act], 0x1E, 0, 0);
-	keybd_event(key[act], 0x1E, KEYEVENTF_KEYUP, 0);
-	Sleep(1000);
+void press(int act) {
+	keybd_event(act, 0x1E, 0, 0);
+	keybd_event(act, 0x1E, KEYEVENTF_KEYUP, 0);
+	// Sleep(1000);
 }
+
+// Defined by myself
+int userCount = 0;
+int p1x, p2x;
+Act p1Act, p2Act;
+
+void keyboardInput(Act p1, Act p2) {
+	press(key1[p1]);
+	press(key2[p2]);
+}
+
 
 int main(int argc, char** argv)
 {
@@ -216,6 +228,10 @@ int main(int argc, char** argv)
 								const UINT uTextLength = 260;
 								wchar_t sName[uTextLength];
 
+								++userCount;
+								if (userCount > 2)
+									break;
+
 								// for each gestures
 								for (UINT j = 0; j < iGestureCount; ++j)
 								{
@@ -237,16 +253,53 @@ int main(int argc, char** argv)
 
 											// output information
 											wcout << L"Detected Gesture " << sName << L" @" << fConfidence << endl;
-											press(motion[i]);
+											if (userCount == 1)
+											{
+												p1Act = motion[i];
+											}
+											else if (userCount == 2)
+											{
+												p2Act = motion[i];
+											}
 										}
 										pGestureResult->Release();
 									}
 								}
+
+								// Tell different from player1 and player 2 via x index
+								Joint aJoints[JointType::JointType_Count];
+								if (pBody->GetJoints(JointType::JointType_Count, aJoints) == S_OK)
+								{
+									const Joint& rJointPos = aJoints[JointType::JointType_Head];
+									if (rJointPos.TrackingState != TrackingState_NotTracked)
+									{
+										if (userCount == 1) 
+										{
+											p1x = rJointPos.Position.X;
+										}
+										else if (userCount == 2) 
+										{
+											p2x = rJointPos.Position.X;
+										}
+									}
+								}
+
+								
 							}
 							pGestureFrame->Release();
 						}
 					}
 				}
+				if (userCount == 2) {
+					if (p1x > p2x)
+					{
+						Act tmp = p1Act;
+						p1Act = p2Act;
+						p2Act = tmp;
+					}
+					keyboardInput(p1Act, p2Act);
+				}
+				userCount = 0;
 			}
 			else
 			{
