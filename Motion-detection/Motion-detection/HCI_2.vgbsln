@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GestureBuilderFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<SolutionFile>
+		<Header>
+			<Date>2023-01-09</Date>
+			<Time>15:45:09.0476803+08:00</Time>
+			<Version>1</Version>
+			<Type>Solution</Type>
+			<ID>54e8476b-5b97-4274-9099-cd7fa4c5c2c4</ID>
+		</Header>
+		<Solution_Data>
+			<Files>
+				<Name />
+				<Content>
+					<Items>
+						<File>Defense_low.vgbproj</File>
+					</Items>
+					<Items>
+						<File>Defense_low.a.vgbproj</File>
+					</Items>
+					<Items>
+						<File>D:/OneDrive/文件/Kinect Studio/Repository/upAttack.vgbproj</File>
+					</Items>
+					<Items>
+						<File>D:/OneDrive/文件/Kinect Studio/Repository/upAttack.a.vgbproj</File>
+					</Items>
+				</Content>
+			</Files>
+		</Solution_Data>
+		<UI_State />
+		<Attributes />
+	</SolutionFile>
+</GestureBuilderFile>
