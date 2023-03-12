@@ -8,6 +8,5 @@
 
 ## Demo Video
 
-* Hand Detection : 
-  - https://www.youtube.com/watch?v=vDAVfbOmlJw
+* https://www.youtube.com/watch?v=vDAVfbOmlJw
   
