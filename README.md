@@ -1,14 +1,10 @@
-# Combat-Game
-2022 HCI Final Project
+# Combat-Game  -- 2022 HCI Final Project
 
 
 ## What is this repository
 
-&nbsp;&nbsp;&nbsp;&nbsp;There are 3 assignments for HCI class, which is Hand Detection (with Python), Hand Writing Number Recognition(With Javascript and Web) and the experience of using Alexa Assistant.
+&nbsp;&nbsp;&nbsp;&nbsp;Inside the Motion-detection repository, there are some gba and gbd file for the motion detection trainning data and C++ code for motion detection.The PDF document "HCI Final Project__Document" have the concept and detail about this project.
 
-## How to Use it
-  
-&nbsp;&nbsp;&nbsp;&nbsp;There are user manual inside each repository, and some of them have demo video.
 
 ## Demo Video
 
